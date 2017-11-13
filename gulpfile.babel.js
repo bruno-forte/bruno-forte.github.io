@@ -5,7 +5,6 @@ import gulp from 'gulp';
 
 // Load all gulp plugins automatically
 // and attach them to the `plugins` object
-import plugins from 'gulp-load-plugins';
 
 // Temporary solution until gulp 4
 // https://github.com/gulpjs/gulp/issues/355
@@ -76,7 +75,6 @@ gulp.task('clean', (done) => {
 });
 
 gulp.task('copy', [
-    'copy:.htaccess',
     'copy:index.html',
     'copy:jquery',
     'copy:license',
@@ -85,11 +83,6 @@ gulp.task('copy', [
     'copy:normalize'
 ]);
 
-gulp.task('copy:.htaccess', () =>
-    gulp.src('node_modules/apache-server-configs/dist/.htaccess')
-        .pipe(plugins().replace(/# ErrorDocument/g, 'ErrorDocument'))
-        .pipe(gulp.dest(dirs.dist))
-);
 
 gulp.task('copy:index.html', (done) =>
     sri.hash('node_modules/jquery/dist/jquery.min.js', (err, hash) => {
@@ -98,9 +91,6 @@ gulp.task('copy:index.html', (done) =>
         let version = pkg.devDependencies.jquery;
         let modernizrVersion = pkg.devDependencies.modernizr;
         gulp.src(`${dirs.src}/index.html`)
-            .pipe(plugins().replace(/{{JQUERY_VERSION}}/g, version))
-            .pipe(plugins().replace(/{{MODERNIZR_VERSION}}/g, modernizrVersion))
-            .pipe(plugins().replace(/{{JQUERY_SRI_HASH}}/g, hash))
             .pipe(gulp.dest(dirs.dist));
         done();
     })
@@ -108,7 +98,6 @@ gulp.task('copy:index.html', (done) =>
 
 gulp.task('copy:jquery', () =>
     gulp.src(['node_modules/jquery/dist/jquery.min.js'])
-        .pipe(plugins().rename(`jquery-${pkg.devDependencies.jquery}.min.js`))
         .pipe(gulp.dest(`${dirs.dist}/js/vendor`))
 );
 
@@ -122,11 +111,7 @@ gulp.task('copy:main.css', () => {
     const banner = `/*! HTML5 Boilerplate v${pkg.version} | ${pkg.license} License | ${pkg.homepage} */\n\n`;
 
     gulp.src(`${dirs.src}/css/main.css`)
-        .pipe(plugins().header(banner))
-        .pipe(plugins().autoprefixer({
-            browsers: ['last 2 versions', 'ie >= 9', '> 1%'],
-            cascade: false
-        }))
+
         .pipe(gulp.dest(`${dirs.dist}/css`));
 });
 
@@ -167,10 +152,7 @@ gulp.task('lint:js', () =>
         'gulpfile.js',
         `${dirs.src}/js/*.js`,
         `${dirs.test}/*.js`
-    ]).pipe(plugins().jscs())
-      .pipe(plugins().jshint())
-      .pipe(plugins().jshint.reporter('jshint-stylish'))
-      .pipe(plugins().jshint.reporter('fail'))
+    ])
 );
 
 
